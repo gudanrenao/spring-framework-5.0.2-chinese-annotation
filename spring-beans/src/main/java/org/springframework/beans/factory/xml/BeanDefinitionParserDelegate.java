@@ -515,7 +515,7 @@ public class BeanDefinitionParserDelegate {
 
 			//对<Bean>元素的meta(元信息)属性解析
 			parseMetaElements(ele, bd);
-			//对<Bean>元素的lookup-method属性解析
+			//对<Bean>元素的lookup-method属性解析（可以实现方法获取bean的灵活修改）
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			//对<Bean>元素的replaced-method属性解析
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -568,19 +568,21 @@ public class BeanDefinitionParserDelegate {
 		}
 		else if (containingBean != null) {
 			// Take default from containing bean in case of an inner bean definition.
+			//在嵌入 beanDefinition 情况下且没有单独指定 scope 属性则佼用父类默认的属性
 			bd.setScope(containingBean.getScope());
 		}
-
+		//解析 abstract 属性
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
-
+		//解忻 lazy-init 属性
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
 		if (DEFAULT_VALUE.equals(lazyInit)) {
 			lazyInit = this.defaults.getLazyInit();
 		}
+		//若没有设置或设置成其他字符都会被设置为 false
 		bd.setLazyInit(TRUE_VALUE.equals(lazyInit));
-
+		//解析 autowire 属性
 		String autowire = ele.getAttribute(AUTOWIRE_ATTRIBUTE);
 		bd.setAutowireMode(getAutowireMode(autowire));
 

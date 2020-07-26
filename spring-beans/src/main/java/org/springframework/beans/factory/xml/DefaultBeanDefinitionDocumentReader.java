@@ -120,6 +120,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	/**
 	 * Register each bean definition within the given root {@code <beans/>} element.
+	 * 这是一个模板方法，里面的preProcessXml、postProcessXml。留给子类实现
 	 */
 	protected void doRegisterBeanDefinitions(Element root) {
 		// Any nested <beans> elements will cause recursion in this method. In
@@ -135,10 +136,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
 		if (this.delegate.isDefaultNamespace(root)) {
+			//处理 profile 属性(dev/prod等)；
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
+				//如果环境变量里没有定义激活该profile,那么不需要去解析该root节点
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					if (logger.isInfoEnabled()) {
 						logger.info("Skipped XML bean definition file due to specified profiles [" + profileSpec +
@@ -149,11 +152,11 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 
-		//在解析Bean定义之前，进行自定义的解析，增强解析过程的可扩展性
+		//在解析Bean定义之前，进行自定义的解析，增强解析过程的可扩展性；留给子类实现；这是模板方法模式
 		preProcessXml(root);
 		//从Document的根元素开始进行Bean定义的Document对象
 		parseBeanDefinitions(root, this.delegate);
-		//在解析Bean定义之后，进行自定义的解析，增加解析过程的可扩展性
+		//在解析Bean定义之后，进行自定义的解析，增加解析过程的可扩展性；留给子类实现；这是模板方法模式
 		postProcessXml(root);
 
 		this.delegate = parent;

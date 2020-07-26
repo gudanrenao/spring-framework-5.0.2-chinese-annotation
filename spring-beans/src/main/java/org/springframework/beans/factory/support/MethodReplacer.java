@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
  *
  * @author Rod Johnson
  * @since 1.1
+ * 动态更改原有方法的逻辑
  */
 public interface MethodReplacer {
 
